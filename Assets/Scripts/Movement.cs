@@ -1,12 +1,14 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float speed = 5f;              // The speed at which the player moves
-    public float swipeThreshold = 50f;   // The minimum distance required for a swipe
+    [SerializeField] private float moveSpeed = 5f;
 
-    private bool isMoving = false;       // Tracks if the player is currently moving
-    private Vector2 startPosition;       // The position where a swipe started
+    private bool isMoving = false;
+    private Vector2 startingTouchPosition;
+    private Vector2 currentTouchPosition;
 
     void Update()
     {
@@ -16,44 +18,28 @@ public class Movement : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
-                // If the screen is being touched, track the starting position of the touch
-                startPosition = touch.position;
+                isMoving = true;
+                startingTouchPosition = touch.position;
             }
             else if (touch.phase == TouchPhase.Moved)
             {
-                // If the screen is being swiped, calculate the swipe distance and direction
-                Vector2 swipeDelta = touch.position - startPosition;
-                float swipeDistance = swipeDelta.magnitude;
-
-                if (swipeDistance >= swipeThreshold)
-                {
-                    // If the swipe distance is greater than the threshold, move the player on the Z-axis
-                    float swipeAngle = Mathf.Atan2(swipeDelta.y, swipeDelta.x) * Mathf.Rad2Deg;
-                    float zMovement = swipeAngle > 0 ? 1 : -1;
-                    transform.position += new Vector3(zMovement, 0, 0) * speed * Time.deltaTime;
-                }
+                currentTouchPosition = touch.position;
             }
-            else if (touch.phase == TouchPhase.Stationary)
+            else if (touch.phase == TouchPhase.Ended)
             {
-                // If the screen is being held down, move the player up on the X-axis
-                isMoving = true;
-            }
-            else
-            {
-                // If the screen is not being touched or swiped, stop moving the player
                 isMoving = false;
             }
         }
         else
         {
-            // If there are no touches, stop moving the player
             isMoving = false;
         }
 
         if (isMoving)
         {
-            // Move the player up on the X-axis
-            transform.position += Vector3.forward * speed * Time.deltaTime;
+            Vector3 movement = new Vector3((currentTouchPosition.x - startingTouchPosition.x) * 0.02f, 0f, moveSpeed);
+
+            transform.position += movement * Time.deltaTime;
         }
     }
 }
