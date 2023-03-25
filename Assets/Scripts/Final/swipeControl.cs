@@ -19,6 +19,14 @@ public class swipeControl : MonoBehaviour
 
     [Tooltip("The players constant forewards movement.")] [Range(1f, 100f)] float speed = 12f;
 
+
+    [Header("Keycodes")]
+
+    [Tooltip("The left movement key")] [SerializeField] KeyCode leftKey = KeyCode.A;
+    [Tooltip("The right movement key")] [SerializeField] KeyCode rightKey = KeyCode.D;
+    [Tooltip("The jump button")] [SerializeField] KeyCode jumpKey = KeyCode.Space;
+
+
     // The current lane index
     private int currentLane = 0;
 
@@ -81,8 +89,17 @@ public class swipeControl : MonoBehaviour
             }
         }
 
+
+        if(Input.GetKeyDown(jumpKey)){
+            if (isGrounded)
+            {
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                isGrounded = false;
+            }
+        }
+
         // Check for keyboard input
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(leftKey))
         {
             // Move to the previous lane
             targetLane = currentLane - 1;
@@ -90,7 +107,7 @@ public class swipeControl : MonoBehaviour
             // Clamp the target lane index to the valid range
             targetLane = Mathf.Clamp(targetLane, 0, numLanes - 1);
         }
-        else if (Input.GetKeyDown(KeyCode.D))
+        else if (Input.GetKeyDown(rightKey))
         {
             // Move to the next lane
             targetLane = currentLane + 1;
